@@ -1,58 +1,65 @@
+const user = JSON.parse(localStorage.getItem("phoenixUser"));
 const messages = document.getElementById("messages");
 
 function speak(text){
     const speech = new SpeechSynthesisUtterance(text);
-    speech.rate = 1;
-    speech.pitch = 1;
+
     speech.lang = "en-US";
+
+    if(user.voice === "Female"){
+        speech.pitch = 1.4;
+    } else {
+        speech.pitch = 0.8;
+    }
+
     speechSynthesis.speak(speech);
 }
 
-function addMessage(sender,text){
-    messages.innerHTML += "<p><b>"+sender+":</b> "+text+"</p>";
-    messages.scrollTop = messages.scrollHeight;
+function add(text){
+    messages.innerHTML += "<p>"+text+"</p>";
 }
 
-async function getReply(input){
+function generateReply(input){
 
-    const res = await fetch("knowledge.json");
-    const data = await res.json();
+input = input.toLowerCase();
 
-    input = input.toLowerCase();
-
-    if(data[input]){
-        return data[input];
-    }
-
-    // fallback thinking
-    if(input.includes("sad")){
-        return "Talk to me. What's wrong?";
-    }
-
-    if(input.includes("name")){
-        return "I am PH03NIX AI.";
-    }
-
-    return "I'm still learning. Teach me that.";
+if(user.admin){
+    return "Welcome back Joshua. Systems fully synchronized.";
 }
 
-function startListening(){
+if(user.personality === "Funny"){
+    return "Hmm… interesting. Tell me more before I make jokes about it.";
+}
 
-    const recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
+if(user.personality === "Motivational"){
+    return "You’ve got this. Keep going.";
+}
 
-    recognition.lang = "en-US";
+if(user.personality === "Serious"){
+    return "Analyzing your statement.";
+}
 
-    recognition.start();
+if(user.personality === "Calm"){
+    return "Let's take it step by step.";
+}
 
-    recognition.onresult = async function(event){
-        const text = event.results[0][0].transcript;
+return "I'm listening.";
+}
 
-        addMessage("You",text);
+function talk(){
 
-        const reply = await getReply(text);
+const rec = new(window.SpeechRecognition||window.webkitSpeechRecognition)();
+rec.start();
 
-        addMessage("AI",reply);
+rec.onresult = e=>{
+const text = e.results[0][0].transcript;
 
-        speak(reply);
-    };
+add("<b>You:</b> "+text);
+
+const reply = generateReply(text);
+
+add("<b>AI:</b> "+reply);
+
+speak(reply);
+};
 }
