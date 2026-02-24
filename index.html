@@ -1,19 +1,7 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>PH03NIX AI</title>
-<link rel="stylesheet" href="style.css">
-</head>
-
-<body>
-<div class="chat">
-    <h2>PH03NIX AI</h2>
-
-    <div id="messages"></div>
-
-    <button onclick="startListening()">🎤 Talk</button>
-</div>
-
-<script src="brain.js"></script>
-</body>
-</html>
+<script>
+if(localStorage.getItem("phoenixUser")){
+    window.location="chat.html";
+}else{
+    window.location="setup.html";
+}
+</script>
