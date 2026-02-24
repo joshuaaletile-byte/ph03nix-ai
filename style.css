@@ -1,1 +1,27 @@
+body {
+    background:#0f172a;
+    color:white;
+    font-family:sans-serif;
+    text-align:center;
+}
 
+.chat {
+    margin-top:40px;
+}
+
+#messages {
+    height:300px;
+    overflow:auto;
+    padding:10px;
+    border:1px solid #334155;
+    margin:20px;
+}
+
+button {
+    padding:15px;
+    background:#22c55e;
+    border:none;
+    font-size:18px;
+    color:white;
+    border-radius:10px;
+}
