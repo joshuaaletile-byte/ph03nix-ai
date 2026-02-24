@@ -1,1 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
 
+<h2>Welcome to PH03NIX-GRID</h2>
+
+<input id="name" placeholder="Enter your name">
+
+<select id="personality">
+<option>Friendly</option>
+<option>Serious</option>
+<option>Motivational</option>
+<option>Funny</option>
+<option>Calm</option>
+<option>All-Adaptive</option>
+</select>
+
+<select id="voice">
+<option>Female</option>
+<option>Male</option>
+</select>
+
+<button onclick="saveUser()">Enter</button>
+
+<p>POWERED BY PH03NIX</p>
+
+<script>
+async function saveUser(){
+
+const user = {
+name: document.getElementById("name").value,
+personality: document.getElementById("personality").value,
+voice: document.getElementById("voice").value,
+admin: document.getElementById("name").value.toLowerCase() === "joshua"
+};
+
+localStorage.setItem("phoenixUser", JSON.stringify(user));
+
+await fetch("/saveUser",{
+method:"POST",
+headers:{'Content-Type':'application/json'},
+body: JSON.stringify(user)
+});
+
+window.location="chat.html";
+}
+</script>
+
+</body>
+</html>
