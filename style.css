@@ -1,27 +1,22 @@
-body {
-    background:#0f172a;
-    color:white;
-    font-family:sans-serif;
-    text-align:center;
+body{
+background:#0b1d3a;
+color:#ffd700;
+font-family:Segoe UI;
+text-align:center;
 }
 
-.chat {
-    margin-top:40px;
+#messages{
+background:#08142b;
+border:1px solid #ffd700;
+height:320px;
+overflow:auto;
+margin:20px;
+padding:10px;
 }
 
-#messages {
-    height:300px;
-    overflow:auto;
-    padding:10px;
-    border:1px solid #334155;
-    margin:20px;
-}
-
-button {
-    padding:15px;
-    background:#22c55e;
-    border:none;
-    font-size:18px;
-    color:white;
-    border-radius:10px;
+button{
+background:#122b55;
+color:#ffd700;
+border:1px solid #ffd700;
+padding:12px;
 }
