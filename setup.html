@@ -3,38 +3,42 @@
 <head>
 <link rel="stylesheet" href="style.css">
 </head>
-<body>
 
-<h2>Welcome to PH03NIX-GRID</h2>
+<body>
+<h2>PH03NIX-GRID Initialization</h2>
 
 <input id="name" placeholder="Enter your name">
 
-<select id="personality">
-<option>Friendly</option>
-<option>Serious</option>
-<option>Motivational</option>
-<option>Funny</option>
-<option>Calm</option>
-<option>All-Adaptive</option>
+<select id="title">
+<option>Master</option>
+<option>Commander</option>
+<option>Boss</option>
+<option>Custom</option>
 </select>
+
+<input id="customTitle" placeholder="Custom title">
 
 <select id="voice">
 <option>Female</option>
 <option>Male</option>
 </select>
 
-<button onclick="saveUser()">Enter</button>
+<button onclick="enter()">Initialize</button>
 
 <p>POWERED BY PH03NIX</p>
 
 <script>
-async function saveUser(){
+async function enter(){
+
+let title = document.getElementById("title").value;
+if(title === "Custom"){
+title = document.getElementById("customTitle").value;
+}
 
 const user = {
 name: document.getElementById("name").value,
-personality: document.getElementById("personality").value,
-voice: document.getElementById("voice").value,
-admin: document.getElementById("name").value.toLowerCase() === "joshua"
+title: title,
+voice: document.getElementById("voice").value
 };
 
 localStorage.setItem("phoenixUser", JSON.stringify(user));
@@ -48,6 +52,5 @@ body: JSON.stringify(user)
 window.location="chat.html";
 }
 </script>
-
 </body>
 </html>
