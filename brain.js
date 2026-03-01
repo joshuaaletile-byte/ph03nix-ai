@@ -1,65 +1,60 @@
 const user = JSON.parse(localStorage.getItem("phoenixUser"));
-const messages = document.getElementById("messages");
+const box = document.getElementById("messages");
+
+function add(sender,text){
+box.innerHTML += `<p><b>${sender}:</b> ${text}</p>`;
+box.scrollTop = box.scrollHeight;
+}
 
 function speak(text){
-    const speech = new SpeechSynthesisUtterance(text);
-
-    speech.lang = "en-US";
-
-    if(user.voice === "Female"){
-        speech.pitch = 1.4;
-    } else {
-        speech.pitch = 0.8;
-    }
-
-    speechSynthesis.speak(speech);
+const s = new SpeechSynthesisUtterance(text);
+s.pitch = user.voice === "Female" ? 1.3 : 0.8;
+speechSynthesis.speak(s);
 }
 
-function add(text){
-    messages.innerHTML += "<p>"+text+"</p>";
+async function think(msg){
+
+const res = await fetch("/ask",{
+method:"POST",
+headers:{'Content-Type':'application/json'},
+body: JSON.stringify({message:msg,user:user.name})
+});
+
+return (await res.json()).reply;
 }
 
-function generateReply(input){
+async function talk(){
 
-input = input.toLowerCase();
-
-if(user.admin){
-    return "Welcome back Joshua. Systems fully synchronized.";
-}
-
-if(user.personality === "Funny"){
-    return "Hmm… interesting. Tell me more before I make jokes about it.";
-}
-
-if(user.personality === "Motivational"){
-    return "You’ve got this. Keep going.";
-}
-
-if(user.personality === "Serious"){
-    return "Analyzing your statement.";
-}
-
-if(user.personality === "Calm"){
-    return "Let's take it step by step.";
-}
-
-return "I'm listening.";
-}
-
-function talk(){
-
-const rec = new(window.SpeechRecognition||window.webkitSpeechRecognition)();
+const rec = new(window.SpeechRecognition||webkitSpeechRecognition)();
 rec.start();
 
-rec.onresult = e=>{
+rec.onresult = async e=>{
 const text = e.results[0][0].transcript;
 
-add("<b>You:</b> "+text);
+add("You",text);
 
-const reply = generateReply(text);
+const reply = await think(text);
+const final = `${user.title}, ${reply}`;
 
-add("<b>AI:</b> "+reply);
+add("PH03NIX",final);
+speak(final);
 
-speak(reply);
+fetch("/saveConversation",{
+method:"POST",
+headers:{'Content-Type':'application/json'},
+body: JSON.stringify({user:user.name,message:text,reply:final})
+});
 };
+}
+
+async function teach(){
+await fetch("/teach",{
+method:"POST",
+headers:{'Content-Type':'application/json'},
+body: JSON.stringify({
+question:document.getElementById("q").value,
+answer:document.getElementById("a").value
+})
+});
+alert("Learned.");
 }
