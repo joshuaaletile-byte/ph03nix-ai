@@ -6,73 +6,60 @@ const app = express();
 app.use(express.json());
 app.use(express.static(__dirname));
 
-/* =========================
-   USER MEMORY (already exists)
-========================= */
+function load(f){ return JSON.parse(fs.readFileSync(f)); }
+function save(f,d){ fs.writeFileSync(f,JSON.stringify(d,null,2)); }
 
-app.post("/saveUser", (req,res)=>{
-    const user = req.body;
-    const data = JSON.parse(fs.readFileSync("users.json"));
-    data[user.name] = user;
-    fs.writeFileSync("users.json", JSON.stringify(data,null,2));
-    res.send({status:"saved"});
+/* USERS */
+app.post("/saveUser",(req,res)=>{
+const users = load("users.json");
+users[req.body.name]=req.body;
+save("users.json",users);
+res.sendStatus(200);
 });
 
-/* =========================
-   AI RESPONSE ENGINE
-========================= */
+/* MEMORY */
+app.post("/saveConversation",(req,res)=>{
+const c = load("conversations.json");
+c.push(req.body);
+save("conversations.json",c);
+res.sendStatus(200);
+});
 
-function generateReply(input, username="Guest"){
+/* TEACH */
+app.post("/teach",(req,res)=>{
+const l = load("lessons.json");
+l[req.body.question.toLowerCase()] = req.body.answer;
+save("lessons.json",l);
+res.sendStatus(200);
+});
 
-input = input.toLowerCase();
+/* THINK */
+app.post("/ask",(req,res)=>{
+const lessons = load("lessons.json");
+const input = req.body.message.toLowerCase();
 
-if(username.toLowerCase() === "joshua"){
-    return "Admin Joshua detected. PH03NIX-GRID fully aligned.";
-}
+let reply = lessons[input] || "I am learning. Teach me that.";
+res.send({reply});
+});
 
-if(input.includes("hello"))
-    return "Hello. I am PH03NIX-GRID.";
-
-if(input.includes("who are you"))
-    return "I am an adaptive intelligence built without external AI.";
-
-if(input.includes("sad"))
-    return "Talk to me. You are not alone.";
-
-return "Processing that. Tell me more.";
-}
-
-/* =========================
-   TELEGRAM WEBHOOK
-========================= */
-
-const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
+/* TELEGRAM */
+const TOKEN = process.env.TELEGRAM_TOKEN;
 
 app.post("/telegram", async (req,res)=>{
-
 const msg = req.body.message;
-
 if(!msg) return res.sendStatus(200);
 
-const chatId = msg.chat.id;
-const text = msg.text || "";
-const username = msg.from.first_name;
+const lessons = load("lessons.json");
+const text = msg.text.toLowerCase();
+const reply = lessons[text] || "Teach me more.";
 
-const reply = generateReply(text, username);
-
-await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`,{
+await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`,{
 method:"POST",
 headers:{'Content-Type':'application/json'},
-body: JSON.stringify({
-chat_id: chatId,
-text: reply
-})
+body: JSON.stringify({chat_id:msg.chat.id,text:reply})
 });
 
 res.sendStatus(200);
 });
 
-/* ========================= */
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, ()=>console.log("PH03NIX-GRID Running"));
+app.listen(process.env.PORT||3000);
