@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PH03NIX GRID</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="header">PH03NIX GRID</div>
+
+<!-- Admin Control Panel (Only visible to Joshua) -->
+<div id="adminPanel" style="display:none;">
+<h3>Admin Control</h3>
+<button onclick="switchMode('JARVIS')">JARVIS Mode</button>
+<button onclick="switchMode('PH03NIX')">PH03NIX Mode</button>
+</div>
+
+<div id="chatbox"></div>
+
+<div class="input-area">
+<input id="userInput" placeholder="Type your message..." />
+<button onclick="sendMessage()">Send</button>
+</div>
+
+<div class="footer">POWERED BY PH03NIX</div>
+
+<script>
+// ===== USER SETUP =====
+let username = localStorage.getItem("ph03nix_name");
+if(!username){
+    username = prompt("What should I call you?");
+    localStorage.setItem("ph03nix_name", username);
+}
+
+// Show admin panel if username is Joshua
+const ADMIN_NAME = "Joshua";
+if(username.toLowerCase() === ADMIN_NAME.toLowerCase()){
+    document.getElementById("adminPanel").style.display = "block";
+}
+
+// ===== SEND MESSAGE =====
+async function sendMessage(){
+    const input = document.getElementById("userInput");
+    const text = input.value.trim();
+    if(!text) return;
+    addMessage(text,"user");
+    input.value = "";
+
+    const res = await fetch("/chat", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({message:text, user:username})
+    });
+    const data = await res.json();
+    addMessage(data.reply,"bot");
+}
+
+// ===== DISPLAY MESSAGES =====
+function addMessage(text,type){
+    const chatbox = document.getElementById("chatbox");
+    const msg = document.createElement("div");
+    msg.className = "message "+type;
+    msg.innerText = text;
+    chatbox.appendChild(msg);
+    chatbox.scrollTop = chatbox.scrollHeight;
+}
+
+// ===== ADMIN MODE SWITCH =====
+async function switchMode(mode){
+    await fetch("/set_mode", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({mode:mode})
+    });
+    addMessage("Mode switched to "+mode,"bot");
+}
+
+// ===== ENTER KEY =====
+document.getElementById("userInput").addEventListener("keypress", function(e){
+    if(e.key==="Enter") sendMessage();
+});
+</script>
+
+</body>
+</html>
