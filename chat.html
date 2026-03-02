@@ -1,23 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-<link rel="stylesheet" href="style.css">
+   <title>PH03NIX</title>
 </head>
 
-<body>
-<h2>PH03NIX-GRID</h2>
-
-<div id="messages"></div>
-
-<button onclick="talk()">🎤 Speak</button>
-
-<h3>Teach PH03NIX</h3>
-<input id="q" placeholder="Question">
-<input id="a" placeholder="Answer">
-<button onclick="teach()">Teach</button>
-
-<p>POWERED BY PH03NIX</p>
-
-<script src="brain.js"></script>
-</body>
-</html>
+<div id="adminPanel" style="display:none;">
+<h3>Admin Control</h3>
+<button onclick="switchMode('JARVIS')">JARVIS Mode</button>
+<button onclick="switchMode('PH03NIX')">PH03NIX Mode</button>
+</div>
