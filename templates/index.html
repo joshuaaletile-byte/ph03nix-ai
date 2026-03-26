@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>PH03NIX</title>
+<style>
+body {
+background:#0b1a2f;
+color:gold;
+font-family:Arial;
+text-align:center;
+padding-top:100px;
+}
+input,button{
+padding:10px;
+margin:10px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Welcome to PH03NIX</h1>
+
+<input id="name" placeholder="Enter your name">
+
+<br>
+
+<button onclick="enter()">Enter</button>
+
+<p>POWERED BY PH03NIX</p>
+
+<script>
+function enter(){
+let name=document.getElementById("name").value;
+localStorage.setItem("username",name);
+window.location="/chat";
+}
+</script>
+
+</body>
+</html>
