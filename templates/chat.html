@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>PH03NIX GRID</title>
+
+<style>
+body{
+margin:0;
+font-family:Arial;
+background:#061326;
+color:#FFD700;
+}
+
+.header{
+text-align:center;
+padding:15px;
+font-size:22px;
+font-weight:bold;
+box-shadow:0 0 15px gold;
+}
+
+#chat{
+height:65vh;
+overflow:auto;
+padding:10px;
+}
+
+.msg{
+margin:10px;
+padding:10px;
+border-radius:10px;
+max-width:80%;
+}
+
+.user{
+background:#0b2a4a;
+align-self:right;
+}
+
+.bot{
+background:#112f5c;
+box-shadow:0 0 10px gold;
+}
+
+.controls{
+position:fixed;
+bottom:0;
+width:100%;
+background:#061326;
+padding:10px;
+display:flex;
+gap:5px;
+}
+
+input{
+flex:1;
+padding:10px;
+border:none;
+border-radius:5px;
+}
+
+button{
+background:gold;
+border:none;
+padding:10px;
+border-radius:5px;
+}
+
+.footer{
+text-align:center;
+padding:5px;
+font-size:12px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">PH03NIX GRID</div>
+
+<div id="chat"></div>
+
+<div class="controls">
+<input id="msg" placeholder="Say 'Hey PH03NIX' or type..." />
+<button onclick="send()">Send</button>
+<button onclick="startWake()">🎤</button>
+</div>
+
+<div class="footer">POWERED BY PH03NIX</div>
+
+<script>
+let username = localStorage.getItem("username");
+
+// 🔊 Speak
+function speak(text){
+let speech = new SpeechSynthesisUtterance(text);
+speech.rate=1;
+speech.pitch=0.8;
+speechSynthesis.speak(speech);
+}
+
+// Add message
+function add(text,type){
+let div=document.createElement("div");
+div.className="msg "+type;
+div.innerHTML=text;
+document.getElementById("chat").appendChild(div);
+}
+
+// Send message
+async function send(){
+let msg=document.getElementById("msg").value;
+document.getElementById("msg").value="";
+
+add("<b>You:</b> "+msg,"user");
+
+let res=await fetch("/send",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({username:username,message:msg})
+});
+
+let data=await res.json();
+
+add("<b>PH03NIX:</b> "+data.reply,"bot");
+
+speak(data.reply);
+}
+
+// 🎤 Wake word system
+function startWake(){
+const rec=new (window.SpeechRecognition||window.webkitSpeechRecognition)();
+rec.lang="en-US";
+rec.continuous=true;
+
+rec.onresult=(e)=>{
+let text=e.results[e.results.length-1][0].transcript.toLowerCase();
+
+if(text.includes("hey phoenix")){
+speak("Yes Master. I am listening.");
+startCommand();
+rec.stop();
+}
+};
+
+rec.start();
+}
+
+// 🎤 Command mode
+function startCommand(){
+const rec=new (window.SpeechRecognition||window.webkitSpeechRecognition)();
+rec.lang="en-US";
+rec.start();
+
+rec.onresult=(e)=>{
+let cmd=e.results[0][0].transcript;
+document.getElementById("msg").value=cmd;
+send();
+};
+}
+</script>
+
+</body>
+</html>
